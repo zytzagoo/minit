@@ -72,6 +72,13 @@ class Minit {
 
 		$minit_todo = array_diff( $todo, $minit_exclude );
 
+		// Exclude stuff already minited on previus page loads
+		foreach ( $minit_todo as $t => $script ) {
+			if ( false !== strpos( $script, 'minit-' ) ) {
+				unset( $minit_todo[$t] );
+			}
+		}
+
 		if ( empty( $minit_todo ) )
 			return $todo;
 
