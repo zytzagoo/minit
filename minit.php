@@ -163,8 +163,9 @@ class Minit {
 				'extension' => $extension
 			);
 
-		// Cache this set of scripts for 24 hours
-		set_transient( 'minit-' . $cache_ver, $status, 24 * 60 * 60 );
+		// Cache this set for 24 hours by default for both css and js, but allow filtering
+		$expiration = apply_filters( 'minit-cache-expiration-' . $extension, DAY_IN_SECONDS );
+		set_transient( 'minit-' . $cache_ver, $status, $expiration );
 
 		$this->set_done( $cache_ver );
 
