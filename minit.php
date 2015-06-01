@@ -67,7 +67,7 @@ class Minit {
 		// Allow files to be excluded from Minit
 		$minit_exclude = (array) apply_filters( 'minit-exclude-' . $extension, array() );
 
-		// Exluce all minit items by default
+		// Exclude all minit items by default
 		$minit_exclude = array_merge( $minit_exclude, $this->get_done() );
 
 		$minit_todo = array_diff( $todo, $minit_exclude );
