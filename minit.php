@@ -175,21 +175,19 @@ class Minit {
 
 	function minit_enqueue_files( &$object, $status ) {
 
-		extract( $status );
-
-		switch ( $extension ) {
+		switch ( $status['extension'] ) {
 
 			case 'css':
 
 				wp_enqueue_style(
-					'minit-' . $cache_ver,
-					$url,
+					'minit-' . $status['cache_ver'],
+					$status['url'],
 					null,
 					null
 				);
 
 				// Add inline styles for all minited styles
-				foreach ( $done as $script ) {
+				foreach ( $status['done'] as $script ) {
 
 					$inline_style = $object->get_data( $script, 'after' );
 
@@ -207,51 +205,53 @@ class Minit {
 
 			case 'js':
 
+				$in_footer = apply_filters( 'minit-js-in-footer', true );
+
 				wp_enqueue_script(
-					'minit-' . $cache_ver,
-					$url,
+					'minit-' . $status['cache_ver'],
+					$status['url'],
 					null,
 					null,
-					apply_filters( 'minit-js-in-footer', true )
+					$in_footer
 				);
 
 				// Add to the correct
 				$object->set_group(
-					'minit-' . $cache_ver,
+					'minit-' . $status['cache_ver'],
 					false,
-					apply_filters( 'minit-js-in-footer', true )
+					$in_footer
 				);
 
 				$inline_data = array();
 
 				// Add inline scripts for all minited scripts
-				foreach ( $done as $script )
+				foreach ( $status['done'] as $script )
 					$inline_data[] = $object->get_data( $script, 'data' );
 
 				// Filter out empty elements
 				$inline_data = array_filter( $inline_data );
 
 				if ( ! empty( $inline_data ) )
-					$object->add_data( 'minit-' . $cache_ver, 'data', implode( "\n", $inline_data ) );
+					$object->add_data( 'minit-' . $status['cache_ver'], 'data', implode( "\n", $inline_data ) );
 
 				break;
 
 			default:
 
-				return $todo;
+				return $status['todo'];
 
 		}
 
 		// Remove scripts that were merged
-		$todo = array_diff( $todo, $done );
+		$todo = array_diff( $status['todo'], $status['done'] );
 
-		$todo[] = 'minit-' . $cache_ver;
+		$todo[] = 'minit-' . $status['cache_ver'];
 
 		// Mark these items as done
-		$object->done = array_merge( $object->done, $done );
+		$object->done = array_merge( $object->done, $status['done'] );
 
 		// Remove Minit items from the queue
-		$object->queue = array_diff( $object->queue, $done );
+		$object->queue = array_diff( $object->queue, $status['done'] );
 
 		return $todo;
 
